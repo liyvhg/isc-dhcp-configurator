@@ -1,0 +1,11 @@
+/**
+ * Client side stylesheet.
+ * 
+ * @package	isc-dhcp-configurator
+ * @author	SBF
+ */
+
+root { 
+	display: block;
+}
+

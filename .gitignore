@@ -1,0 +1,11 @@
+# IDE crap
+/nbproject
+/.settings
+/.buildpath
+/.project
+ 
+# Mac OS crap
+.DS_Store
+.TemporaryItems
+._*
+
