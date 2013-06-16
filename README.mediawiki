@@ -1,0 +1,16 @@
+==isc-dhcp-configurator==
+
+Web based configuration file editor for ISC DHCP server.
+
+This project is incomplete and does not yet function.
+
+=== Installation ===
+
+Place all files in a directory writable and accessible by your web server and browse to the corresponding URL. You require
+an Internet connection as libraries are downloaded from various CDNs.
+
+=== Requirements ===
+
+* PHP 5.3
+* PHP SQLite3 extension. Installation of this varies from system to system.
+* Web server requires write access to the installation directory.

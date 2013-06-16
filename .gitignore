@@ -1,3 +1,6 @@
+# project specific
+data.sqlite
+
 # IDE crap
 /nbproject
 /.settings

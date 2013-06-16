@@ -9,3 +9,21 @@ root {
 	display: block;
 }
 
+.content {
+	margin: 20px;
+}
+
+H1, H2, H3, H4, H5, H6 {
+	font-weight: normal;
+}
+
+.float-right {
+	float: right;
+}
+
+.editor {
+	display: none;
+}
+
+.text-right { text-align: right !important; }
+.text-center { text-align: center !important; }
