@@ -8,21 +8,18 @@
  */
 function ManagerController($scope, $http) {
 	
-	// list of existing files
-	$scope.fileList = [
-		{
-			id:		1,
-			label:		'test',
-			updated:	'test 2'
-		}
-	];
+	// set up existing file list
+	$scope.fileList = [];
+	$scope.showFileList = false;
 	
-	// show file list?
-	if ($scope.fileList.length > 0) {
-		$scope.showFileList = true;
-	} else {
-		$scope.showFileList = false;
-	}
+	// retrieve list of existing files
+	$http.post('api.php', {method: 'listFiles'})
+		.success(function (data) {
+			$scope.fileList = data.list;
+			$scope.showFileList = true;
+		}).error(function (data, status) {
+			alert(data.code+': '+data.error);
+		});
 	
 	// new file label text box model
 	$scope.newFileLabel = {
@@ -56,21 +53,30 @@ function ManagerController($scope, $http) {
 		}
 		
 		// API call
-		$http({
+		$http.post('api.php', {
 			
-			method:	'POST',	url: 'api.php',
-			data: { method: 'create', label: $scope.newFileLabel.text }
+			method: 'createFile',
+			label: $scope.newFileLabel.text
 			
 		}).success(function (data, status) {
 			
-			$('#newFileModal').modal({ show: false});
+			$('#newFileModal').modal('hide');
+			$scope.fileList.push({id: data.id, label: $scope.newFileLabel.text, updated: 'Just created'});
 			$scope.showFileList = true;
 			
 		}).error(function (data, status) {
-			
-			alert('Unable to create new configuration file.')
-			
+			alert(data.code+': '+data.error);
 		});
+		
+	}
+	
+	// load selected file
+	$scope.loadFile = function($index) {
+
+		// retrieve file ID
+		var fileID = $scope.fileList[$index].id;
+
+
 		
 	}
 

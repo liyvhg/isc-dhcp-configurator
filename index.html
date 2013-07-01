@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <html lang="en" ng-app>
-	
+
 <head>
 	
 	<title>ISC DHCP Configurator</title>
@@ -52,8 +52,8 @@
 		<tbody>
 			<tr ng-repeat="file in fileList">
 				<td>{{file.label}}</td>
-				<td>{{file.updated}}</td>
-				<td class="text-center"><button class="btn btn-mini" file="{{file.id}}">Load</button></td>
+				<td>{{file.updated*1000|date:'medium'}}</td>
+				<td class="text-center"><button class="btn btn-mini" ng-click="loadFile($index)">Load</button></td>
 			</tr>
 		</tbody>
 

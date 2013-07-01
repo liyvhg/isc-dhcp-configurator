@@ -8,7 +8,7 @@
  */
 
 // setup and execute
-$api = new API($_POST);
+$api = new API();
 
 class API {
 	
@@ -47,13 +47,14 @@ class API {
 	
 	/**
 	 * Construct.
-	 * 
-	 * @param array $params
 	 */
-	public function __construct($post) {
+	public function __construct() {
+		
+		// decode request
+		$request = json_decode(file_get_contents('php://input'));
 		
 		// check method called exists
-		if (empty($post['method']) || !method_exists($this, $post['method']) || in_array($post['method'], $this->forbiddenMethods)) {
+		if (empty($request->method) || !method_exists($this, $request->method) || in_array($request->method, $this->forbiddenMethods)) {
 			header('HTTP/1.1 400', true, 400);
 			$this->sendError(1000);
 			return;
@@ -76,8 +77,8 @@ class API {
 		}
 		
 		// call method
-		$method = $post['method'];
-		$response = $this->$method($post);
+		$method = $request->method;
+		$response = $this->$method($request);
 		
 		// send status and response
 		if (!empty($this->error)) {
@@ -177,22 +178,38 @@ class API {
 	/**
 	 * Create new configuration file.
 	 * 
-	 * @param array $post POST parameters
+	 * @param array $request
 	 * 
 	 * @return array
 	 */
-	private function create($post) {
+	private function createFile($request) {
 		
 		$id = $this->getNextID('files');
 		
 		$statement = $this->db->prepare("INSERT INTO files (id, label, created, updated) VALUES (:id, :label, :created, :updated)");
 		$statement->bindValue(':id', $id);
-		$statement->bindValue(':label', $post['label']);
+		$statement->bindValue(':label', $request->label);
 		$statement->bindValue(':created', time());
 		$statement->bindValue(':updated', time());
 		$statement->execute();
 		
 		return array('id' => $id);
+		
+	}
+	
+	/**
+	 * List all existing files.
+	 * 
+	 * @param array $request
+	 */
+	private function listFiles($request) {
+		
+		$list = array();
+		
+		$result = $this->db->query("SELECT * FROM files ORDER BY label ASC, updated DESC, created DESC");
+		while ($row = $result->fetchArray(SQLITE3_ASSOC)) $list[] = $row;
+		
+		return array('list' => $list);
 		
 	}
 	
