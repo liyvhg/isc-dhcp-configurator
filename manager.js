@@ -1,15 +1,19 @@
 /**
  * ManagerController.
  * 
- * Controls the configuration file manager.
- * 
  * @package	isc-dhcp-configurator
  * @author	SBF
  */
 function ManagerController($scope, $http) {
 	
-	// set up existing file list
+	// intialise models
+	$scope.parameters = [];
+	$scope.reservations = [];
 	$scope.fileList = [];
+	
+	// set initial states
+	$scope.showEditor = false;
+	$scope.filename = { text: 'No file loaded' };
 	$scope.showFileList = false;
 	
 	// retrieve list of existing files
@@ -60,12 +64,18 @@ function ManagerController($scope, $http) {
 			
 		}).success(function (data, status) {
 			
+			// hide modal
 			$('#newFileModal').modal('hide');
-			$scope.fileList.push({id: data.id, label: $scope.newFileLabel.text, updated: 'Just created'});
+			
+			// add new file to list and show the list
+			var timestamp = Math.round(new Date().getTime() / 1000);
+			$scope.fileList.push({id: data.id, label: $scope.newFileLabel.text, updated: timestamp});
 			$scope.showFileList = true;
 			
 		}).error(function (data, status) {
+			
 			alert(data.code+': '+data.error);
+			
 		});
 		
 	}
@@ -75,8 +85,29 @@ function ManagerController($scope, $http) {
 
 		// retrieve file ID
 		var fileID = $scope.fileList[$index].id;
+		
+		
+		
+		// show editor
+		$scope.showEditor = true;
+		
+	}
 
+	// delete selected file
+	$scope.deleteFile = function($index) {
 
+		if (confirm('Are you sure you wish to delete the file "'+$scope.fileList[$index].label+'"?')) {
+			
+			$http.post('api.php', {
+				method: 'deleteFile',
+				id: $scope.fileList[$index].id
+			}).success(function (data, status) {
+				$scope.fileList.splice($index, 1);
+			}).error(function (data, status) {
+				alert(data.code+': '+data.error);
+			});
+			
+		}
 		
 	}
 

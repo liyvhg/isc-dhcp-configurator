@@ -15,13 +15,11 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.1/angular.min.js"></script>
-	
 	<script src="manager.js"></script>
-	<script src="editor.js"></script>
 	
 </head>
 
-<body>
+<body ng-controller="ManagerController">
 	
 <div class="navbar">
 	<div class="navbar-inner">
@@ -32,7 +30,7 @@
 
 <div class="content">
 	
-<fieldset ng-controller="ManagerController">
+<fieldset>
 	
 	<legend>
 		<span class="float-right"><button type="button" class="btn btn-primary btn-small" ng-click="openNewFileModal()">Create new file</button></span>
@@ -45,7 +43,7 @@
 			<tr>
 				<th>Label</th>
 				<th>Last updated</th>
-				<th class="text-center">Load</th>
+				<th class="text-center">Actions</th>
 			</tr>
 		</thead>
 		
@@ -53,7 +51,10 @@
 			<tr ng-repeat="file in fileList">
 				<td>{{file.label}}</td>
 				<td>{{file.updated*1000|date:'medium'}}</td>
-				<td class="text-center"><button class="btn btn-mini" ng-click="loadFile($index)">Load</button></td>
+				<td class="text-center">
+					<button class="btn btn-mini" ng-click="loadFile($index)">Load</button>
+					<button class="btn btn-mini btn-danger" ng-click="deleteFile($index)">Delete</button>
+				</td>
 			</tr>
 		</tbody>
 
@@ -80,11 +81,11 @@
 
 </fieldset>
 	
-<fieldset ng-controller="EditorController">
+<fieldset>
 	
 	<legend>{{filename.text}}</legend>
 	
-	<div class="editor">
+	<div class="editor" ng-show="showEditor">
 	
 		<h4>Parameters</h4>
 

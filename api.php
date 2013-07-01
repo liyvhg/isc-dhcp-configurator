@@ -213,4 +213,27 @@ class API {
 		
 	}
 	
+	/**
+	 * Delete a file and all its linked data
+	 * 
+	 * @param array $request
+	 */
+	private function deleteFile($request) {
+		
+		$statement = $this->db->prepare("DELETE FROM files WHERE id = :id");
+		$statement->bindValue(':id', $request->id);
+		$statement->execute();
+		
+		$statement = $this->db->prepare("DELETE FROM parameters WHERE file_id = :id");
+		$statement->bindValue(':id', $request->id);
+		$statement->execute();
+		
+		$statement = $this->db->prepare("DELETE FROM reservations WHERE file_id = :id");
+		$statement->bindValue(':id', $request->id);
+		$statement->execute();
+		
+		return array('id' => $request->id);
+		
+	}
+	
 }
