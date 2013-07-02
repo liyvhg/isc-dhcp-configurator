@@ -13,7 +13,7 @@ function ManagerController($scope, $http) {
 	
 	// set initial states
 	$scope.showEditor = false;
-	$scope.filename = { text: 'No file loaded' };
+	$scope.loadedFile = { text: 'No file loaded' };
 	$scope.showFileList = false;
 	
 	// retrieve list of existing files
@@ -86,10 +86,25 @@ function ManagerController($scope, $http) {
 		// retrieve file ID
 		var fileID = $scope.fileList[$index].id;
 		
-		
-		
-		// show editor
-		$scope.showEditor = true;
+		// API call
+		$http.post('api.php', {
+			
+			method: 'loadFile',
+			id: $scope.fileList[$index].id
+			
+		}).success(function (data, status) {
+			
+			
+			
+			// show editor
+			$scope.loadedFile = { text: $scope.fileList[$index].label };
+			$scope.showEditor = true;
+			
+		}).error(function (data, status) {
+			
+			alert(data.code+': '+data.error);
+			
+		});
 		
 	}
 

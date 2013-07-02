@@ -19,7 +19,8 @@ class API {
 	 */
 	private $errorCodes = array(
 		1000	=> 'Method does not exist',
-		1001	=> 'Database file could not be created'
+		1001	=> 'Database file could not be created',
+		1002	=> 'Referenced configuration file does not exist'
 	);
 	
 	/**
@@ -233,6 +234,47 @@ class API {
 		$statement->execute();
 		
 		return array('id' => $request->id);
+		
+	}
+	
+	/**
+	 * Loads linked data for a file.
+	 * 
+	 * @param array $request
+	 */
+	private function loadFile($request) {
+		
+		if (!$this->fileRecordExists($request->id)) {
+			$this->error = 1002;
+			return;
+		}
+		
+		$parameters = $reservations = array();
+		
+		$result = $this->db->query("SELECT * FROM parameters WHERE file_id = {$request->id} ORDER BY id");
+		while ($row = $result->fetchArray(SQLITE3_ASSOC)) $parameters[] = $row;
+		
+		$result = $this->db->query("SELECT * FROM reservations WHERE file_id = {$request->id} ORDER BY id");
+		while ($row = $result->fetchArray(SQLITE3_ASSOC)) $reservations[] = $row;
+		
+		return array(
+			'id'		=> $request->id,
+			'parameters'	=> $parameters,
+			'reservations'	=> $reservations
+		);
+		
+	}
+	
+	/**
+	 * Determines if a file record with a given ID exists.
+	 * 
+	 * @param integer $id
+	 * 
+	 * @return boolean
+	 */
+	private function fileRecordExists($id) {
+		
+		return false;
 		
 	}
 	
