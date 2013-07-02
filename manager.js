@@ -125,5 +125,19 @@ function ManagerController($scope, $http) {
 		}
 		
 	}
+	
+	// add new parameter
+	$scope.newParameter = function() {
+		
+		
+		
+	}
+	
+	// add new reservation
+	$scope.newReservation = function() {
+		
+		
+		
+	}
 
 }

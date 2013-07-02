@@ -274,6 +274,9 @@ class API {
 	 */
 	private function fileRecordExists($id) {
 		
+		$result = $this->db->query("SELECT * FROM files WHERE file_id = {$id} ORDER BY id");
+		while ($row = $result->fetchArray(SQLITE3_ASSOC)) if ($row['id'] == $id) return true;
+		
 		return false;
 		
 	}
