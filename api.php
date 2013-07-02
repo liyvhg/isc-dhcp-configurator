@@ -131,6 +131,7 @@ class API {
 			file_id INTEGER NOT NULL,
 			param_key VARCHAR(255) NOT NULL,
 			param_val TEXT(25) NOT NULL,
+			notes VARCHAR(255) NOT NULL,
 			PRIMARY KEY (id))
 		");
 		
@@ -274,10 +275,21 @@ class API {
 	 */
 	private function fileRecordExists($id) {
 		
-		$result = $this->db->query("SELECT * FROM files WHERE file_id = {$id} ORDER BY id");
+		$result = $this->db->query("SELECT * FROM files WHERE id = {$id} ORDER BY id");
 		while ($row = $result->fetchArray(SQLITE3_ASSOC)) if ($row['id'] == $id) return true;
 		
 		return false;
+		
+	}
+	
+	/**
+	 * Saves a file by replacing all records with submitted set.
+	 * 
+	 * @param array $request
+	 */
+	private function saveFile($request) {
+		
+		
 		
 	}
 	

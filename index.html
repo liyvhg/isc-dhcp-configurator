@@ -49,7 +49,7 @@
 		
 		<tbody>
 			<tr ng-repeat="file in fileList">
-				<td>{{file.label}}</td>
+				<td><input type="text" ng-model="file.label"></td>
 				<td>{{file.updated*1000|date:'medium'}}</td>
 				<td class="text-center">
 					<button class="btn btn-mini" ng-click="loadFile($index)">Load</button>
@@ -83,14 +83,17 @@
 	
 <fieldset>
 	
-	<legend>{{loadedFile.text}}</legend>
+	<legend>
+		<span ng-show="loadedFile" class="float-right">
+			<button type="button" class="btn btn-primary btn-small" ng-click="generateFile()">Generate</button>
+			<button type="button" class="btn btn-primary btn-small" ng-click="saveFile()">Save</button>
+		</span>
+		{{loadedFile.label}}
+	</legend>
 	
-	<div class="editor" ng-show="showEditor">
+	<div class="editor" ng-show="loadedFile">
 	
-		<h4>
-			<span class="float-right"><button type="button" class="btn btn-small" ng-click="newParameter()">Add new</button></span>
-			Parameters
-		</h4>
+		<h4>Parameters</h4>
 
 		<table class="table table-striped">
 
@@ -98,14 +101,16 @@
 				<tr>
 					<th>Parameter</th>
 					<th>Value</th>
-					<th class="text-center">Actions</th>
+					<th>Notes</th>
+					<th class="text-center"><button type="button" class="btn btn-mini btn-success" ng-click="newParameter()">Add new</button></th>
 				</tr>
 			</thead>
 
 			<tbody>
 				<tr ng-repeat="parameter in parameters">
-					<td>{{parameter.param_key}}</td>
-					<td>{{parameter.param_val}}</td>
+					<td><input type="text" ng-model="parameter.param_key"></td>
+					<td><input type="text" ng-model="parameter.param_val"></td>
+					<td><input type="text" ng-model="parameter.notes"></td>
 					<td class="text-center">
 						<button class="btn btn-mini btn-danger" ng-click="deleteParameter($index)">Delete</button>
 					</td>
@@ -114,10 +119,7 @@
 
 		</table>
 		
-		<h4>
-			<span class="float-right"><button type="button" class="btn btn-small" ng-click="newReservation()">Add new</button></span>
-			Reservations
-		</h4>
+		<h4>Reservations</h4>
 		
 		<table class="table table-striped">
 
@@ -126,15 +128,15 @@
 					<th>Label</th>
 					<th>MAC address</th>
 					<th>Reserved IP</th>
-					<th class="text-center">Actions</th>
+					<th class="text-center"><button type="button" class="btn btn-mini btn-success" ng-click="newReservation()">Add new</button></th>
 				</tr>
 			</thead>
 
 			<tbody>
 				<tr ng-repeat="reservation in reservations">
-					<td>{{reservation.label}}</td>
-					<td>{{reservation.mac_address}}</td>
-					<td>{{reservation.ip_address}}</td>
+					<td><input type="text" ng-model="reservation.label"></td>
+					<td><input type="text" ng-model="reservation.mac_address"></td>
+					<td><input type="text" ng-model="reservation.ip_address"></td>
 					<td class="text-center">
 						<button class="btn btn-mini btn-danger" ng-click="deleteReservation($index)">Delete</button>
 					</td>

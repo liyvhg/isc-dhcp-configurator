@@ -12,8 +12,7 @@ function ManagerController($scope, $http) {
 	$scope.fileList = [];
 	
 	// set initial states
-	$scope.showEditor = false;
-	$scope.loadedFile = { text: 'No file loaded' };
+	$scope.loadedFile = false;
 	$scope.showFileList = false;
 	
 	// retrieve list of existing files
@@ -94,10 +93,16 @@ function ManagerController($scope, $http) {
 			
 		}).success(function (data, status) {
 			
+			// insert data into model
+			$scope.parameters = data.parameters;
+			$scope.reservations = data.reservations;
 			
+			// add new lines
+			$scope.newParameter();
+			$scope.newReservation();
 			
 			// show editor
-			$scope.loadedFile = { text: $scope.fileList[$index].label };
+			$scope.loadedFile = $scope.fileList[$index];
 			$scope.showEditor = true;
 			
 		}).error(function (data, status) {
@@ -128,13 +133,48 @@ function ManagerController($scope, $http) {
 	
 	// add new parameter
 	$scope.newParameter = function() {
-		
-		
-		
+		$scope.parameters.push({param_key: '', param_val: '', notes: ''});
 	}
 	
 	// add new reservation
 	$scope.newReservation = function() {
+		$scope.reservations.push({label: '', mac_address: '', ip_address: ''});
+	}
+	
+	// delete parameter
+	$scope.deleteParameter = function($index) {
+		$scope.parameters.splice($index, 1);
+	}
+	
+	// delete reservation
+	$scope.deleteReservation = function($index) {
+		$scope.reservations.splice($index, 1);
+	}
+	
+	// save file to database
+	$scope.saveFile = function() {
+		
+		// remove completely blank records
+		
+		
+		// API call
+		$http.post('api.php', {
+			
+			method: 'saveFile',
+			file: $scope.loadedFile,
+			parameters: $scope.parameters,
+			reservations: $scope.reservations
+			
+		}).success(function (data, status) {
+			alert('File saved successfully.');
+		}).error(function (data, status) {
+			alert(data.code+': '+data.error);
+		});
+		
+	}
+	
+	// generate and export file
+	$scope.generateFile = function() {
 		
 		
 		
