@@ -120,6 +120,8 @@ class API {
 			CREATE TABLE files
 			(id INTEGER NOT NULL,
 			label VARCHAR(255) NOT NULL,
+			subnet VARCHAR(16) NOT NULL,
+			netmask VARCHAR(16) NOT NULL,
 			created INTEGER NOT NULL,
 			updated INTEGER NOT NULL,
 			PRIMARY KEY (id))
@@ -188,9 +190,11 @@ class API {
 		
 		$id = $this->getNextID('files');
 		
-		$statement = $this->db->prepare("INSERT INTO files (id, label, created, updated) VALUES (:id, :label, :created, :updated)");
+		$statement = $this->db->prepare("INSERT INTO files (id, label, subnet, netmask, created, updated) VALUES (:id, :label, :subnet, :netmask, :created, :updated)");
 		$statement->bindValue(':id', $id);
 		$statement->bindValue(':label', $request->label);
+		$statement->bindValue(':subnet', $request->subnet);
+		$statement->bindValue(':netmask', $request->netmask);
 		$statement->bindValue(':created', time());
 		$statement->bindValue(':updated', time());
 		$statement->execute();
@@ -289,7 +293,54 @@ class API {
 	 */
 	private function saveFile($request) {
 		
+		// set update time
+		$updated = time();
 		
+		// update main file record
+		$statement = $this->db->prepare("UPDATE files SET label= :label, subnet = :subnet, netmask = :netmask, updated = :updated WHERE id = :id");
+		$statement->bindValue(':label', $request->file->label);
+		$statement->bindValue(':subnet', $request->file->subnet);
+		$statement->bindValue(':netmask', $request->file->netmask);
+		$statement->bindValue(':updated', $updated);
+		$statement->bindValue(':id', $request->file->id);
+		$statement->execute();
+		
+		// remove existing parameters
+		$statement = $this->db->prepare("DELETE FROM parameters WHERE file_id = :id");
+		$statement->bindValue(':id', $request->file->id);
+		$statement->execute();
+		
+		// remove existing reservations
+		$statement = $this->db->prepare("DELETE FROM reservations WHERE file_id = :id");
+		$statement->bindValue(':id', $request->file->id);
+		$statement->execute();
+		
+		// replace parameters
+		foreach ($request->parameters as $parameter) {
+			$statement = $this->db->prepare("INSERT INTO parameters (id, file_id, param_key, param_val, notes) VALUES (:id, :file_id, :key, :val, :notes)");
+			$statement->bindValue(':id', $this->getNextID('parameters'));
+			$statement->bindValue(':file_id', $request->file->id);
+			$statement->bindValue(':key', $parameter->param_key);
+			$statement->bindValue(':val', $parameter->param_val);
+			$statement->bindValue(':notes', $parameter->notes);
+			$statement->execute();
+		}
+		
+		// replace reservations
+		foreach ($request->reservations as $reservation) {
+			$statement = $this->db->prepare("INSERT INTO reservations (id, file_id, label, mac_address, ip_address) VALUES (:id, :file_id, :label, :mac, :ip)");
+			$statement->bindValue(':id', $this->getNextID('reservations'));
+			$statement->bindValue(':file_id', $request->file->id);
+			$statement->bindValue(':label', $reservation->label);
+			$statement->bindValue(':mac', $reservation->mac_address);
+			$statement->bindValue(':ip', $reservation->ip_address);
+			$statement->execute();
+		}
+		
+		return array(
+			'id'		=> $request->file->id,
+			'updated'	=> $updated
+		);
 		
 	}
 	

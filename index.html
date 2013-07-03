@@ -42,6 +42,8 @@
 		<thead>
 			<tr>
 				<th>Label</th>
+				<th>Subnet</th>
+				<th>Netmask</th>
 				<th>Last updated</th>
 				<th class="text-center">Actions</th>
 			</tr>
@@ -50,6 +52,8 @@
 		<tbody>
 			<tr ng-repeat="file in fileList">
 				<td><input type="text" ng-model="file.label"></td>
+				<td><input type="text" ng-model="file.subnet"></td>
+				<td><input type="text" ng-model="file.netmask"></td>
 				<td>{{file.updated*1000|date:'medium'}}</td>
 				<td class="text-center">
 					<button class="btn btn-mini" ng-click="loadFile($index)">Load</button>
@@ -66,10 +70,22 @@
 			<h4>Create new configuration file</h4>
 		</div>
 		<div class="modal-body">
-			<div class="control-group {{newFileLabel.validation}}">
+			<div class="control-group {{newFile.labelValid}}">
 				<div class="controls">
 					<label for="newFileLabel">Label for new file</label>
-					<input type="text" id="newFileLabel" ng-model="newFileLabel.text" data-toggle="popover" data-content="Please specify a label for the new file" data-placement="right" data-trigger="manual">
+					<input class="hasPopover" type="text" id="newFileLabel" ng-model="newFile.label" data-toggle="popover" data-content="Please specify a label for the new file" data-placement="right" data-trigger="manual">
+				</div>
+			</div>
+			<div class="control-group {{newFile.subnetValid}}">
+				<div class="controls">
+					<label for="newFileSubnet">Subnet</label>
+					<input class="hasPopover" type="text" id="newFileSubnet" ng-model="newFile.subnet" data-toggle="popover" data-content="Please specify a subnet, e.g. 192.168.0.1" data-placement="right" data-trigger="manual">
+				</div>
+			</div>
+			<div class="control-group {{newFile.netmaskValid}}">
+				<div class="controls">
+					<label for="newFileNetmask">Netmask</label>
+					<input class="hasPopover" type="text" id="newFileNetmask" ng-model="newFile.netmask" data-toggle="popover" data-content="Please specify a netmask, e.g. 255.255.255.0" data-placement="right" data-trigger="manual">
 				</div>
 			</div>
 		</div>
