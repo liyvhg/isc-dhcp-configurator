@@ -178,8 +178,8 @@ function ManagerController($scope, $http) {
 	$scope.saveFile = function() {
 		
 		// remove completely blank records from models
-		$scope.parameters = $scope.removeBlanks($scope.parameters);
-		$scope.reservations = $scope.removeBlanks($scope.reservations);
+	//	$scope.parameters = $scope.removeBlanks($scope.parameters);
+	//	$scope.reservations = $scope.removeBlanks($scope.reservations);
 		
 		// API call
 		$http.post('api.php', {
@@ -214,12 +214,28 @@ function ManagerController($scope, $http) {
 		// open subnet
 		config += 'subnet '+$scope.loadedFile.subnet+' netmask '+$scope.loadedFile.netmask+' {\n\n';
 		
+		// add parameters
+		$scope.parameters.forEach(function(param) {
+			if (param.param_key != '') {
+				if (param.notes != '') config += '\t# '+param.notes+'\n';
+				config += '\t'+param.param_key+' '+param.param_val+';\n';
+			}
+		});
+		config += '\n';
 		
+		// add reservations
+		config += '\t# static reservations\n';
+		$scope.reservations.forEach(function(rsv) {
+			if (rsv.label != '') {
+				config += '\thost '+rsv.label+' { hardware ethernet '+rsv.mac_address+'; fixed-address '+rsv.ip_address+'; }\n';
+			}
+		});
 		
 		// close subnet
-		config += '\n}\n';
+		config += '\n\n}\n';
 		
 		console.log(config);
+		window.open("data:text/plain," + escape(config));
 		
 	}
 	

@@ -124,7 +124,7 @@
 
 			<tbody>
 				<tr ng-repeat="parameter in parameters">
-					<td><input type="text" ng-model="parameter.param_key"></td>
+					<td><input type="text" ng-model="parameter.param_key" data-provide="typeahead"></td>
 					<td><input type="text" ng-model="parameter.param_val"></td>
 					<td><input type="text" ng-model="parameter.notes"></td>
 					<td class="text-center">
