@@ -5,6 +5,7 @@
  * 
  * @package	isc-dhcp-configurator
  * @author	SBF
+ * @version	1.00
  */
 
 // setup and execute
@@ -20,7 +21,8 @@ class API {
 	private $errorCodes = array(
 		1000	=> 'Method does not exist',
 		1001	=> 'Database file could not be created',
-		1002	=> 'Referenced configuration file does not exist'
+		1002	=> 'Referenced configuration file does not exist',
+		1003	=> 'SQLite3 is not installed on your web server'
 	);
 	
 	/**
@@ -50,6 +52,13 @@ class API {
 	 * Construct.
 	 */
 	public function __construct() {
+		
+		// check SQLite3 is installed
+		if (!class_exists('SQLite3')) {
+			header('HTTP/1.1 400', true, 400);
+			$this->sendError(1003);
+			exit;
+		}
 		
 		// decode request
 		$request = json_decode(file_get_contents('php://input'));

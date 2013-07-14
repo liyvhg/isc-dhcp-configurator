@@ -3,8 +3,14 @@
  * 
  * @package	isc-dhcp-configurator
  * @author	SBF
+ * @version	1.00
  */
-function ManagerController($scope, $http) {
+
+// create module
+var app = angular.module('dhcp', ['directives']);
+
+// main controller
+app.controller('ManagerController', function($scope, $http) {
 	
 	// intialise models
 	$scope.parameters = [];
@@ -120,9 +126,9 @@ function ManagerController($scope, $http) {
 			$scope.parameters = data.parameters;
 			$scope.reservations = data.reservations;
 			
-			// add new lines
-			$scope.newParameter();
-			$scope.newReservation();
+			// add new lines (disabled until blank line remover is working properly)
+		//	$scope.newParameter();
+		//	$scope.newReservation();
 			
 			// show editor
 			$scope.loadedFile = $scope.fileList[$index];
@@ -178,8 +184,8 @@ function ManagerController($scope, $http) {
 	$scope.saveFile = function() {
 		
 		// remove completely blank records from models
-	//	$scope.parameters = $scope.removeBlanks($scope.parameters);
-	//	$scope.reservations = $scope.removeBlanks($scope.reservations);
+		$scope.parameters = $scope.removeBlanks($scope.parameters);
+		$scope.reservations = $scope.removeBlanks($scope.reservations);
 		
 		// API call
 		$http.post('api.php', {
@@ -234,15 +240,20 @@ function ManagerController($scope, $http) {
 		// close subnet
 		config += '\n\n}\n';
 		
-		console.log(config);
+		// show generated data in a new window
 		window.open("data:text/plain," + escape(config));
 		
 	}
 	
 	/**
 	 * Remove blank records from a model.
+	 * 
+	 * @todo this doesn't work properly and needs revisiting
 	 */
 	$scope.removeBlanks = function(srcModel) {
+		
+		// just return input until I've fixed this
+		return srcModel;
 		
 		var newModel = new Array();
 		
@@ -262,5 +273,44 @@ function ManagerController($scope, $http) {
 		return newModel;
 		
 	}
+	
 
-}
+
+});
+
+// define directives
+angular.module('directives', []).
+	
+	// check that input is unique across the same key in all records in the model
+	directive('unique', function () { 
+		return {
+			require: 'ngModel',
+			link: function(scope, elem, attr, ngModel) {
+				
+				// determine model and key to insist is unique within it
+				var kp = attr.ngModel.split(".");
+				var model = kp[0]+'s';
+				var uKey = kp[1];
+				
+				// bind function to keyup
+				elem.bind('keyup', function() {
+				
+					var testArr = new Array();
+
+					scope[model].forEach(function(row, i) {
+						console.log(testArr.indexOf(row[uKey]));
+						if (testArr.indexOf(row[uKey]) > -1) {
+							elem.parent().parent().addClass('error');
+						} else {
+							elem.parent().parent().removeClass('error');
+						}
+						testArr.push(row[uKey]);
+					});
+				
+				});
+				
+			}
+		};
+	})
+
+;

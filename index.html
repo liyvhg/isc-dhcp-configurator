@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en" ng-app>
+<html lang="en" ng-app='dhcp'>
 
 <head>
 	
@@ -124,7 +124,7 @@
 
 			<tbody>
 				<tr ng-repeat="parameter in parameters">
-					<td><input type="text" ng-model="parameter.param_key" data-provide="typeahead"></td>
+					<td><div class="control-group"><div class="controls"><input type="text" ng-model="parameter.param_key" unique></div></div></td>
 					<td><input type="text" ng-model="parameter.param_val"></td>
 					<td><input type="text" ng-model="parameter.notes"></td>
 					<td class="text-center">
@@ -150,9 +150,9 @@
 
 			<tbody>
 				<tr ng-repeat="reservation in reservations">
-					<td><input type="text" ng-model="reservation.label"></td>
-					<td><input type="text" ng-model="reservation.mac_address"></td>
-					<td><input type="text" ng-model="reservation.ip_address"></td>
+					<td><div class="control-group"><div class="controls"><input type="text" ng-model="reservation.label" unique></div></div></td>
+					<td><div class="control-group"><div class="controls"><input type="text" ng-model="reservation.mac_address" unique></div></div></td>
+					<td><div class="control-group"><div class="controls"><input type="text" ng-model="reservation.ip_address" unique></div></div></td>
 					<td class="text-center">
 						<button class="btn btn-mini btn-danger" ng-click="deleteReservation($index)">Delete</button>
 					</td>
