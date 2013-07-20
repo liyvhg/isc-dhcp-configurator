@@ -1,4 +1,4 @@
-<?
+<?php
 
 /**
  * Server side call fulfillment script.
