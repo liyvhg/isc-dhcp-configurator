@@ -27,3 +27,6 @@ software will require write permission on the directory).
 
 # Fix my function which is supposed to remove un-used lines from parameters and reservations.
 # Add configuration keyword suggestions.
+
+=== Plan ===
+* add bootfile option (for docsis network)
