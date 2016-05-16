@@ -30,3 +30,4 @@ software will require write permission on the directory).
 
 === Plan ===
 * add bootfile option (for docsis network)
+* set some options READONLY
