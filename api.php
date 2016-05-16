@@ -41,6 +41,7 @@ class API {
 	 */
 	private $error;
 	
+	private $localurlpath = '/isc-dhcp-configurator/';
 	/**
 	 * Database handle.
 	 * 
@@ -151,7 +152,8 @@ class API {
 			(id INTEGER NOT NULL,
 			file_id INTEGER NOT NULL,
 			mac_address VARCHAR(32) NOT NULL,
-			ip_address VARCHAR(64) NOT NULL,
+			ip_address VARCHAR(64) NULL,
+			filename VARCHAR(255) NULL,
 			label VARCHAR(255) NOT NULL,
 			PRIMARY KEY (id))
 		");
@@ -337,14 +339,21 @@ class API {
 		
 		// replace reservations
 		foreach ($request->reservations as $reservation) {
-			$statement = $this->db->prepare("INSERT INTO reservations (id, file_id, label, mac_address, ip_address) VALUES (:id, :file_id, :label, :mac, :ip)");
+			$statement = $this->db->prepare("INSERT INTO reservations (id, file_id, label, mac_address, ip_address, bootfile ) VALUES (:id, :file_id, :label, :mac, :ip, :filename)");
 			$statement->bindValue(':id', $this->getNextID('reservations'));
 			$statement->bindValue(':file_id', $request->file->id);
 			$statement->bindValue(':label', $reservation->label);
 			$statement->bindValue(':mac', $reservation->mac_address);
 			$statement->bindValue(':ip', $reservation->ip_address);
+			$statement->bindValue(':filename', $reservation->bootfile);
 			$statement->execute();
 		}
+		
+		//print_r($request);
+		$configfile = 'file.txt';
+		$fh = fopen($configfile, "w");
+		fwrite($fh, serialize($request));
+		fclose($fh);
 		
 		return array(
 			'id'		=> $request->file->id,
@@ -353,4 +362,164 @@ class API {
 		
 	}
 	
+	/**
+	 * Get client ip address
+	 * 
+	 * @param null
+	 * 
+	 * @return $ip
+	 */
+	private function getClientIp() {
+		$unknown = 'unknown';
+		if ( isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+			&& $_SERVER['HTTP_X_FORWARDED_FOR']
+			&& strcasecmp($_SERVER['HTTP_X_FORWARDED_FOR'],
+			$unknown) ) {
+				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			} elseif ( isset($_SERVER['REMOTE_ADDR'])
+			&& $_SERVER['REMOTE_ADDR'] &&
+			strcasecmp($_SERVER['REMOTE_ADDR'], $unknown) ) {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return $ip;
+	}
+	
+	/**
+	 * Save config to a conf file, for dhcpd.conf include.
+	 * 
+	 * @param array $request
+	 */
+	private function genConfigFile($request) {
+		
+		// set update time
+		//$updated = date(‘Y-m-d H:i:s’);
+		$updated = time();
+		$clientip = $this->getClientIp();
+		$contentForWrite = "# Modified by " . $clientip . " @" . date('Y-m-d H:i:s') . "\n" . $request->content;
+		
+		//if (!$this->fileRecordExists($request->id)) {
+		//	$this->error = 1002;
+		//	return;
+		//}
+				
+		#$configfile = 'dhcpd-include-ipv4.conf';
+		$configfile = 'dhcpd-include-ipv4.conf';
+
+		$fh = fopen($configfile, "w");
+		//$status = fwrite($fh, $request->content);
+		//$status = fwrite($fh, "# Modified by ".$clientip." @".$updated."\n".$request->content);
+		$status = fwrite($fh, $contentForWrite);
+		fclose($fh);
+		
+		return array(
+			'status'		=> $status,
+			'filename'	=>	$configfile,
+			'updated'	=> $updated /*,
+			'reservations'	=> $reservations */
+		);
+		
+	}
+
+	// 
+	// Get CGI URI
+	// 
+	// @param string $operation
+	// 
+	// @return string full_uri
+	// 
+	private function getCgiUri($operation) {
+		
+		//$http = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
+		//$port = $_SERVER['SERVER_PORT']==80 ? '' : ':'.$_SERVER["SERVER_PORT"];
+		//$baseurl = $http.$_SERVER['SERVER_NAME'].$port.$_SERVER['DOCUMENT_ROOT'].'/cgi-bin/testenv.cgi?';
+		//$baseurl = $http.$_SERVER['SERVER_NAME'].$this->localurlpath.'/cgi-bin/testenv.cgi?';
+		$baseurl = 'http://127.0.0.1:808/cgibin/testenv.cgi?';
+		if ($operation == 'test4' 
+			|| $operation == 'test6' 
+			|| $operation == 'status4' 
+			|| $operation == 'status6' 
+			|| $operation == 'restart4' 
+			|| $operation == 'restart6' ) 
+		{
+			$url = $baseurl.$operation;
+		}
+		else 
+		{
+			$url = $baseurl.'no-op';
+		}
+		return $url;
+	}
+
+	// 
+	// Check dhcp-config file.
+	// 
+	// @param $request ('4' or '6')
+	// 
+	private function checkConfigFile($request) {
+	
+		if ($request == 4 || $request == '4' || $request == 'ipv4' ) {
+			$url = $this->getCgiUri('test4');
+		}
+		else if ($request == 6 || $request == '6' || $request == 'ipv6' ) {
+			$url = $this->getCgiUri('test6');
+		}
+		
+		// process url via http GET
+		$re = file_get_contents($url);
+		
+		if ( FALSE == strpos($re, 'exiting', 0)) {
+			//printf('ISC-DHCP config file test OK!');
+			return TRUE;
+		}
+		else {
+			//printf('ISC-DHCP config file test Fail!');
+			return FALSE;
+		}
+	}
+	
+	// 
+	// restart ipv4 dhcp server.
+	// 
+	// @param array $request
+	// 
+	private function restartDhcpServer4($request) {
+		// set update time
+		$updated = date('Y-m-d H:i:s');
+		//$updated = time();
+
+		$checkconf = $this->checkConfigFile('ipv4');
+
+		if ($checkconf) {
+			//config file check OK
+			$url = $this->getCgiUri('restart4');
+			$re = file_get_contents($url);
+			
+			$url = $this->getCgiUri('status4');
+			$re = file_get_contents($url);
+			
+			if ( FALSE == strpos($re, 'running', 0)) {
+				//printf('ISC-DHCP config file test Fail!');
+				$message = 'Restart DHCPv4 Server Fail!';
+				$status = FALSE;
+			}
+			else {
+				//printf('ISC-DHCP config file test OK!');
+				$message = 'New config is taking effect!';
+				$status = TRUE;
+			}
+		}
+		else {
+			//config file check Fail
+			$message = 'Check new config file Fail!';
+			$status = FALSE;
+		}
+		
+		return array(
+			'status'	=> $status,
+			'message'	=> $message,
+			'updated'	=> $updated,
+			'debug'	=> $re
+		);
+	}
+
 }
