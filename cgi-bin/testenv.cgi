@@ -1,5 +1,5 @@
 #!/bin/bash
-# @ Li Yuhang, Skyworth Digital Co. Ltd.
+# @ liyvhg
 # 
 # @method: http GET / http POST
 # @param: test4	: test isc-dhcp-server's ipv4 config file
