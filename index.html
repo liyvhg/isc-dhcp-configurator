@@ -9,13 +9,9 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
-	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" media="all">
+	<link href="bootstrap-combined.min.css" rel="stylesheet" media="all">
 	<link href="stylesheet.css" rel="stylesheet" media="all">
 	
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.1/angular.min.js"></script>
-	<script src="manager.js"></script>
 	
 </head>
 
@@ -23,7 +19,7 @@
 	
 <div class="navbar">
 	<div class="navbar-inner">
-		<a class="brand" href="#">DHCP Configurator</a>
+		<a class="brand" href="#" ng-click="pageRefresh()">DHCP Configurator</a>
 		<ul class="nav"></ul>
 	</div>
 </div>
@@ -33,7 +29,7 @@
 <fieldset>
 	
 	<legend>
-		<span class="float-right"><button type="button" class="btn btn-primary btn-small" ng-click="openNewFileModal()">Create new file</button></span>
+		<span class="float-right"><button type="button" disabled class="btn btn-primary btn-small" ng-click="openNewFileModal()">Create new file</button></span>
 		Configuration files
 	</legend>
 	
@@ -56,8 +52,10 @@
 				<td><input type="text" ng-model="file.netmask"></td>
 				<td>{{file.updated*1000|date:'medium'}}</td>
 				<td class="text-center">
-					<button class="btn btn-mini" ng-click="loadFile($index)">Load</button>
-					<button class="btn btn-mini btn-danger" ng-click="deleteFile($index)">Delete</button>
+					<button class="btn" ng-click="loadFile($index)">Load</button>
+					<button class="btn btn-danger" disabled ng-click="deleteFile($index)">Delete</button>
+<!--					<button class="btn btn-mini" ng-click="loadFile($index)">Load</button> -->
+<!--					<button class="btn btn-mini btn-danger" disabled ng-click="deleteFile($index)">Delete</button> -->
 				</td>
 			</tr>
 		</tbody>
@@ -101,14 +99,16 @@
 	
 	<legend>
 		<span ng-show="loadedFile" class="float-right">
-			<button type="button" class="btn btn-primary btn-small" ng-click="generateFile()">Generate</button>
-			<button type="button" class="btn btn-primary btn-small" ng-click="saveFile()">Save</button>
+			<button type="button" class="btn btn-primary btn-small" ng-click="previewConfig()">Preview</button>
+			<button type="button" class="btn btn-primary btn-small" ng-click="saveFile()">SaveToDB</button>
+			<button type="button" class="btn btn-primary btn-small" ng-click="genConfigFile()">Generate</button>
+			<button type="button" class="btn btn-primary btn-small" ng-click="applyConfigFile()">ApplyToServer</button>
 		</span>
 		{{loadedFile.label}}
 	</legend>
 	
 	<div class="editor" ng-show="loadedFile">
-	
+	<!--
 		<h4>Parameters</h4>
 
 		<table class="table table-striped">
@@ -134,8 +134,8 @@
 			</tbody>
 
 		</table>
-		
-		<h4>Reservations</h4>
+		-->
+		<h4>Reservations and Docsis</h4>
 		
 		<table class="table table-striped">
 
@@ -144,6 +144,7 @@
 					<th>Label</th>
 					<th>MAC address</th>
 					<th>Reserved IP</th>
+					<th>Config File</th>
 					<th class="text-center"><button type="button" class="btn btn-mini btn-success" ng-click="newReservation()">Add new</button></th>
 				</tr>
 			</thead>
@@ -153,6 +154,7 @@
 					<td><div class="control-group"><div class="controls"><input type="text" ng-model="reservation.label" unique></div></div></td>
 					<td><div class="control-group"><div class="controls"><input type="text" ng-model="reservation.mac_address" unique></div></div></td>
 					<td><div class="control-group"><div class="controls"><input type="text" ng-model="reservation.ip_address" unique></div></div></td>
+					<td><div class="control-group"><div class="controls"><input type="text" ng-model="reservation.bootfile" unique></div></div></td>
 					<td class="text-center">
 						<button class="btn btn-mini btn-danger" ng-click="deleteReservation($index)">Delete</button>
 					</td>
@@ -166,7 +168,12 @@
 </fieldset>
 
 </div>
-	
+
+	<script src="jquery.min.js"></script>
+	<script src="bootstrap.min.js"></script>
+	<script src="angular.min.js"></script>
+	<script src="manager.js"></script>
+
 </body>
 
 </html>
