@@ -1,4 +1,4 @@
-==isc-dhcp-configurator==
+## isc-dhcp-configurator ##
 
 Web based configuration file editor for ISC DHCP server.
 
@@ -8,7 +8,7 @@ any sort of support for it unless it's something quick and easy to advise upon o
 
 This project is incomplete and does not yet function.
 
-=== Installation ===
+### Installation ###
 
 Place all files in a directory writable and accessible by your web server and browse to the corresponding URL. You require
 an Internet connection as libraries are downloaded from various CDNs.
@@ -17,17 +17,17 @@ I've committed my own data file to the repository so you can see a good real-wor
 from scratch, however, simply delete the data.sqlite file and reload; a new file will be created (your web server
 software will require write permission on the directory).
 
-=== Requirements ===
+### Requirements ###
 
 * PHP 5.3.
 * PHP SQLite3 extension. Installation of this varies from system to system.
 * Web server requires write access to the installation directory.
 
-=== Things I might do to improve it if I can be arsed ===
+### Things I might do to improve it if I can be arsed ###
 
 * Fix my function which is supposed to remove un-used lines from parameters and reservations.
 * Add configuration keyword suggestions.
 
-=== Plan ===
+### Plan ###
 * add bootfile option (for docsis network)
 * set some options READONLY
