@@ -25,8 +25,8 @@ software will require write permission on the directory).
 
 === Things I might do to improve it if I can be arsed ===
 
-# Fix my function which is supposed to remove un-used lines from parameters and reservations.
-# Add configuration keyword suggestions.
+* Fix my function which is supposed to remove un-used lines from parameters and reservations.
+* Add configuration keyword suggestions.
 
 === Plan ===
 * add bootfile option (for docsis network)
